@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Roles    @default(STUDENT)
+  // courses              Course[]
+  // enrollment           Enrollment[]
+  // assignmentSubmission AssignmentSubmission[]
+  // gradedSubmissions    AssignmentSubmission[] @relation("grader")
+  avatarUrl String?  @map("avatar_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+enum Roles {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+// model Course {
+//   id          String   @id @default(uuid())
+//   title       String
+//   description String
+//   teaher      User     @relation(fields: [teacherId], references: [id])
+//   teacherId   String   @map("teacher_id")
+//   lessons     Lesson[]
+
+//   createdAt  DateTime     @default(now()) @map("created_at")
+//   updatedAt  DateTime     @updatedAt @map("updated_at")
+//   enrollment Enrollment[]
+
+//   @@map("courses")
+// }
+
+// model Lesson {
+//   id       String @id @default(uuid())
+//   title    String
+//   content  String
+//   course   Course @relation(fields: [courseId], references: [id])
+//   courseId String @map("course_id")
+
+//   assignment Assignment[]
+//   createdAt  DateTime     @default(now()) @map("created_at")
+//   updatedAt  DateTime     @updatedAt @map("updated_at")
+
+//   @@map("lessons")
+// }
+
+// model Assignment {
+//   id                   String                 @id @default(uuid())
+//   description          String
+//   deadline             DateTime
+//   lesson               Lesson                 @relation(fields: [lessonId], references: [id])
+//   lessonId             String                 @map("lesson_id")
+//   createdAt            DateTime               @default(now()) @map("created_at")
+//   updatedAt            DateTime               @updatedAt @map("updated_at")
+//   assignmentSubmission AssignmentSubmission[]
+
+//   @@map("assignments")
+// }
+
+// model Enrollment {
+//   id        String @id @default(uuid())
+//   student   User   @relation(fields: [studentId], references: [id])
+//   studentId String @map("student_id")
+
+//   course   Course @relation(fields: [courseId], references: [id])
+//   courseId String @map("course_id")
+
+//   createdAt DateTime @default(now()) @map("created_at")
+//   updatedAt DateTime @updatedAt @map("updated_at")
+
+//   @@map("enrollments")
+// }
+
+// model AssignmentSubmission {
+//   id           String     @id @default(uuid())
+//   assignment   Assignment @relation(fields: [assignmentId], references: [id])
+//   assignmentId String
+
+//   student   User   @relation(fields: [studentId], references: [id])
+//   studentId String
+
+//   answer     String
+//   grade      Int?
+//   gradedBy   User?    @relation("grader", fields: [gradedById], references: [id])
+//   gradedById String?
+//   createdAt  DateTime @default(now()) @map("created_at")
+//   updatedAt  DateTime @updatedAt @map("updated_at")
+
+//   @@map("assignmentSubmissions")
+// }
