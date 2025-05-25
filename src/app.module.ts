@@ -1,23 +1,27 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from './auth/guards/roles.guard';
 import { RoleModule } from './role/role.module';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true
-    })
-
-    , PrismaModule,
+    }),
+    PrismaModule,
     AuthModule,
     RoleModule
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes('*');
+  }
+}

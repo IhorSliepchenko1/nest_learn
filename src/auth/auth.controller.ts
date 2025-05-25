@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseFilters, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { RegisterDto } from './dto/register.dto';
@@ -7,6 +7,7 @@ import { JwtAuthGuard } from './decorators/auth.decorator';
 import { UserInfo } from './decorators/user-info.decorator';
 import { User } from '@prisma/client';
 import { Roles } from './decorators/roles.decorator';
+import { UnauthorizedExceptionFilter } from 'src/common/filter/http-exception.filter';
 
 @Controller('auth')
 export class AuthController {
@@ -24,6 +25,7 @@ export class AuthController {
     return await this.authService.login(res, dto)
   }
 
+  @UseFilters(UnauthorizedExceptionFilter)
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(@Res({ passthrough: true }) res: Response, @Req() req: Request) {
