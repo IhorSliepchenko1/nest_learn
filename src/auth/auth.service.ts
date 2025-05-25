@@ -9,7 +9,6 @@ import { isDev } from 'src/utils/is-dev.utils';
 import { RegisterDto } from './dto/register.dto';
 import * as argon2 from "argon2";
 import { LoginDto } from './dto/login.dto';
-import { Roles } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -30,7 +29,7 @@ export class AuthService {
      }
 
      async register(res: Response, dto: RegisterDto) {
-          const { email, role, password } = dto
+          const { email, rolesId, password } = dto
 
           const isUser = await this.prismaService.user.findUnique({
                where: { email }
@@ -40,24 +39,36 @@ export class AuthService {
                throw new ConflictException("Пользователь уже зарегистирован")
           }
 
+          const isRoles = await this.prismaService.role.findMany({
+               where: {
+                    id: { in: rolesId }
+               }
+          })
+
+          if (!isRoles || !isRoles.length) throw new NotFoundException('Роли не найдены')
+
           const hashPassword = await argon2.hash(password)
 
           const user = await this.prismaService.user.create({
                data: {
                     email,
-                    role,
-                    password: hashPassword
+                    password: hashPassword,
+                    roles: {
+                         connect: isRoles.map((role) => ({
+                              id: role.id
+                         }))
+                    },
                },
 
                select: {
                     id: true,
-                    role: true
+                    roles: true
                }
           })
 
-          return this.auth(res, user.id, user.role)
+          const roles = user.roles.map(r => r.name)
+          return this.auth(res, user.id, roles)
      }
-
 
      async login(res: Response, dto: LoginDto) {
           const { email, password } = dto
@@ -70,7 +81,12 @@ export class AuthService {
                select: {
                     id: true,
                     password: true,
-                    role: true
+
+                    roles: {
+                         select: {
+                              name: true
+                         }
+                    }
                }
           })
 
@@ -84,7 +100,11 @@ export class AuthService {
                throw new UnauthorizedException("Не верный логин или пароль")
           }
 
-          return this.auth(res, user.id, user.role)
+          const roles = user.roles.map(r => r.name)
+
+          if (!roles || !roles.length) throw new NotFoundException('Роли не найдены')
+          return this.auth(res, user.id, roles)
+
      }
 
      async refresh(req: Request, res: Response) {
@@ -103,7 +123,11 @@ export class AuthService {
                     },
                     select: {
                          id: true,
-                         role: true
+                         roles: {
+                              select: {
+                                   name: true
+                              }
+                         }
                     }
                })
 
@@ -111,9 +135,11 @@ export class AuthService {
                     throw new NotFoundException('Пользователь не найден')
                }
 
-               return this.auth(res, user.id, user.role)
-          }
+               const roles = user.roles.map(r => r.name)
+               if (!roles || !roles.length) throw new NotFoundException('Роли не найдены')
 
+               return this.auth(res, user.id, roles)
+          }
      }
 
      async logout(res: Response) {
@@ -124,6 +150,9 @@ export class AuthService {
      async validate(id: string) {
           const user = await this.prismaService.user.findUnique({
                where: { id },
+               select: {
+                    id: true,
+               }
           })
 
           if (!user) throw new NotFoundException("Пользователь не найден")
@@ -131,16 +160,16 @@ export class AuthService {
           return user
      }
 
-     private auth(res: Response, id: string, role: Roles) {
-          const { accessToken, refreshToken } = this.generateTokens(id, role)
+     private auth(res: Response, id: string, roles: string[]) {
+          const { accessToken, refreshToken } = this.generateTokens(id, roles)
 
           this.setRefreshTokenCookie(res, refreshToken, new Date(Date.now() + this.JWT_REFRESH_TOKEN_TTL_MS))
 
           return accessToken
      }
 
-     private generateTokens(id: string, role: Roles) {
-          const payload: JwtPayload = { id, role }
+     private generateTokens(id: string, roles: string[]) {
+          const payload: JwtPayload = { id, roles }
 
           const accessToken = this.jwtService.sign(payload, {
                expiresIn: this.JWT_ACCESS_TOKEN_TTL

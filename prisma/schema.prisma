@@ -12,7 +12,7 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
-  role      Roles    @default(STUDENT)
+  roles     Role[]   @relation("users_roles")
   // courses              Course[]
   // enrollment           Enrollment[]
   // assignmentSubmission AssignmentSubmission[]
@@ -24,10 +24,14 @@ model User {
   @@map("users")
 }
 
-enum Roles {
-  STUDENT
-  TEACHER
-  ADMIN
+model Role {
+  id        String   @id @default(uuid())
+  name      String
+  users     User[]   @relation("users_roles")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("roles")
 }
 
 // model Course {

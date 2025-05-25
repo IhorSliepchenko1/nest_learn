@@ -1,5 +1,4 @@
-import { Roles } from "@prisma/client";
-import { IsEmail, IsNotEmpty, IsString, IsUUID, Length, Max, MaxLength, Min, MinLength } from "class-validator";
+import { IsArray, IsEmail, IsNotEmpty, IsString, IsUUID, Length, Max, MaxLength, Min, MinLength } from "class-validator";
 
 export class RegisterDto {
      @IsString({ message: "Почта должно быть строкой" })
@@ -13,6 +12,7 @@ export class RegisterDto {
      @MaxLength(15, { message: "Пароль не должен превышать 15 символов" })
      password: string
 
-     @IsString({ message: "Роль должна быть строкой" })
-     role: Roles
+     @IsArray()
+     @IsUUID('4', { each: true })
+     rolesId: string[]
 }

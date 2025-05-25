@@ -3,11 +3,10 @@ import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { Auth } from './decorators/auth.decorator';
+import { JwtAuthGuard } from './decorators/auth.decorator';
 import { UserInfo } from './decorators/user-info.decorator';
-import { Roles, User } from '@prisma/client';
-import { RolesGuard } from './guards/roles.guard';
-import { UseRoles } from './decorators/use-roles.decorator';
+import { User } from '@prisma/client';
+import { Roles } from './decorators/roles.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -37,11 +36,9 @@ export class AuthController {
     return await this.authService.logout(res)
   }
 
-
   @Get('@me')
-  @Auth()
-  // @UseGuards(RolesGuard)
-  // @UseRoles(Roles.ADMIN)
+  @Roles('ADMIN')
+  @JwtAuthGuard()
   getProfile(@UserInfo() user: User) {
     return user
   }
