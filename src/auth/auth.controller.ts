@@ -36,9 +36,9 @@ export class AuthController {
     return await this.authService.logout(res)
   }
 
-  @Get('@me')
-  @Roles('ADMIN')
   @JwtAuthGuard()
+  @Roles('ADMIN')
+  @Get('@me')
   getProfile(@UserInfo() user: User) {
     return user
   }

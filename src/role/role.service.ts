@@ -13,4 +13,12 @@ export class RoleService {
                }
           })
      }
+
+     async getRole() {
+          return await this.prismaService.role.findMany({
+               select: {
+                    name: true
+               }
+          })
+     }
 }

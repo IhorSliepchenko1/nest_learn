@@ -152,13 +152,22 @@ export class AuthService {
                where: { id },
                select: {
                     id: true,
+                    roles: {
+                         select: {
+                              name: true
+                         }
+                    }
                }
           })
 
           if (!user) throw new NotFoundException("Пользователь не найден")
 
-          return user
+          return {
+               id: user.id,
+               roles: user.roles.map(r => r.name)
+          }
      }
+
 
      private auth(res: Response, id: string, roles: string[]) {
           const { accessToken, refreshToken } = this.generateTokens(id, roles)
