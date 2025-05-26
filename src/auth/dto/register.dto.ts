@@ -1,4 +1,4 @@
-import { IsArray, IsEmail, IsNotEmpty, IsString, IsUUID, Length, Max, MaxLength, Min, MinLength } from "class-validator";
+import { IsArray, IsEmail, IsNotEmpty, IsString, IsUUID, MaxLength, MinLength } from "class-validator";
 
 export class RegisterDto {
      @IsString({ message: "Почта должно быть строкой" })

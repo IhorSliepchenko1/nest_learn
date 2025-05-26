@@ -39,13 +39,13 @@ export class AuthService {
                throw new ConflictException("Пользователь уже зарегистирован")
           }
 
-          const isRoles = await this.prismaService.role.findMany({
+          const roles = await this.prismaService.role.findMany({
                where: {
                     id: { in: rolesId }
                }
           })
 
-          if (!isRoles || !isRoles.length) throw new NotFoundException('Роли не найдены')
+          if (!roles || !roles.length) throw new NotFoundException('Роли не найдены')
 
           const hashPassword = await argon2.hash(password)
 
@@ -54,7 +54,7 @@ export class AuthService {
                     email,
                     password: hashPassword,
                     roles: {
-                         connect: isRoles.map((role) => ({
+                         connect: roles.map((role) => ({
                               id: role.id
                          }))
                     },
@@ -66,8 +66,8 @@ export class AuthService {
                }
           })
 
-          const roles = user.roles.map(r => r.name)
-          return this.auth(res, user.id, roles)
+          const userRoleNames = user.roles.map(r => r.name)
+          return this.auth(res, user.id, userRoleNames)
      }
 
      async login(res: Response, dto: LoginDto) {
@@ -121,6 +121,7 @@ export class AuthService {
                     where: {
                          id: payload.id
                     },
+
                     select: {
                          id: true,
                          roles: {
@@ -167,7 +168,6 @@ export class AuthService {
                roles: user.roles.map(r => r.name)
           }
      }
-
 
      private auth(res: Response, id: string, roles: string[]) {
           const { accessToken, refreshToken } = this.generateTokens(id, roles)
