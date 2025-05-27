@@ -1,13 +1,13 @@
+import { Request, Response } from 'express';
+import * as argon2 from "argon2";
+import parse from 'parse-duration'
 import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from 'src/prisma/prisma.service';
-import parse from 'parse-duration'
 import { JwtService } from '@nestjs/jwt';
-import { Request, Response } from 'express';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtPayload } from './interfaces/jwt.interface';
 import { isDev } from 'src/utils/is-dev.utils';
 import { RegisterDto } from './dto/register.dto';
-import * as argon2 from "argon2";
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()

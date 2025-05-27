@@ -1,4 +1,5 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseFilters, UseGuards } from '@nestjs/common';
+import { ChangeOwnPasswordDto } from './dto/change-own-password.dto';
+import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, Req, Res, UseFilters, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { RegisterDto } from './dto/register.dto';
@@ -8,6 +9,7 @@ import { UserInfo } from './decorators/user-info.decorator';
 import { User } from '@prisma/client';
 import { Roles } from './decorators/roles.decorator';
 import { UnauthorizedExceptionFilter } from 'src/common/filter/http-exception.filter';
+import { ChangeUserPasswordByAdminDto } from './dto/change-user-password-by-admin.dto';
 
 @Controller('auth')
 export class AuthController {
