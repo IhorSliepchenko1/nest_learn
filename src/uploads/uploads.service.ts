@@ -7,15 +7,12 @@ import { v4 as uuidv4 } from 'uuid';
 export class UploadsService {
      saveFileInfo(file: Express.Multer.File) {
           const { filename } = file
-          path.join(__dirname, '../../uploads', filename);
           return filename
      }
-
 
      saveBufferAsFile(buffer: Buffer, filenamePrefix: string = 'avatar'): string {
           const fileName = `${filenamePrefix}_${uuidv4()}.png`;
           const filePath = path.join(__dirname, '../../uploads', fileName);
-
           writeFileSync(filePath, buffer);
 
           return fileName

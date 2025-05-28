@@ -17,7 +17,7 @@ async function bootstrap() {
     console.log(`Создана папка для загрузок: ${uploadPath}`);
   }
 
-  app.useStaticAssets(uploadPath, { prefix: '/uploads/' });
+  app.useStaticAssets(uploadPath);
   app.useGlobalPipes(new ValidationPipe())
   app.use(cookieParser())
 

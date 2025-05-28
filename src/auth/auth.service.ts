@@ -10,9 +10,6 @@ import { isDev } from 'src/utils/is-dev.utils';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import * as jdenticon from "jdenticon"
-import * as path from 'path';
-import * as fs from 'fs';
-import { v4 as uuidv4 } from 'uuid';
 import { UploadsService } from 'src/uploads/uploads.service';
 
 @Injectable()

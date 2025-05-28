@@ -7,6 +7,7 @@ import { Request } from 'express';
 import { changePasswordAsAdminDto } from './dto/change-password-as-admin.dto';
 import { UploadFileInterceptor } from 'src/uploads/interceptors/upload-file.interceptor';
 import { createMulterFilter } from 'src/uploads/filters/multer-exception.filter';
+import { UpdateUserRolesDto } from './dto/update-user-roles.dto';
 
 @Controller('user')
 export class UserController {
@@ -29,8 +30,14 @@ export class UserController {
   @Patch('avatar')
   @UseInterceptors(UploadFileInterceptor(['image/jpeg', 'image/png'], 2, 'avatar'))
   @UseFilters(createMulterFilter('2MB'))
-
   async changeAvatar(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
     return await this.userService.changeAvatar(req, file)
+  }
+
+  @JwtAuthGuard()
+  @Roles('ADMIN')
+  @Patch('update-user-roles')
+  async updateUserRoles(@Body() dto: UpdateUserRolesDto) {
+    return await this.userService.updateUserRoles(dto)
   }
 }
