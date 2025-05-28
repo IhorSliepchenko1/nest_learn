@@ -1,16 +1,20 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ChangeUserPasswordByAdminDto } from './dto/change-user-password-by-admin.dto';
 import { ChangeOwnPasswordDto } from './dto/change-own-password.dto';
 import { JwtPayload } from 'src/auth/interfaces/jwt.interface';
 import { Request } from 'express';
 import * as argon2 from "argon2";
+import { changePasswordAsAdminDto } from './dto/change-password-as-admin.dto';
+import { UploadsService } from 'src/uploads/uploads.service';
 
 @Injectable()
 export class UserService {
-     constructor(private readonly prismaService: PrismaService) { }
+     constructor(
+          private readonly prismaService: PrismaService,
+          private readonly uploadsService: UploadsService
+     ) { }
 
-     async adminChangeUserPassword(dto: ChangeUserPasswordByAdminDto) {
+     async changePasswordAsAdmin(dto: changePasswordAsAdminDto) {
           const { userId, newPassword, oldPassword } = dto
           await this.changePassword(userId, newPassword, oldPassword)
           return true
@@ -20,6 +24,20 @@ export class UserService {
           const { id } = req.user as JwtPayload
           const { newPassword, oldPassword } = dto
           await this.changePassword(id, newPassword, oldPassword)
+          return true
+     }
+
+     async changeAvatar(req: Request, file: Express.Multer.File) {
+          const { id } = req.user as JwtPayload
+          const avatarUrl = this.uploadsService.saveFileInfo(file)
+
+          await this.prismaService.user.update({
+               data: {
+                    avatarUrl
+               },
+               where: { id }
+          })
+
           return true
      }
 

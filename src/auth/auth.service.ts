@@ -9,6 +9,11 @@ import { JwtPayload } from './interfaces/jwt.interface';
 import { isDev } from 'src/utils/is-dev.utils';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import * as jdenticon from "jdenticon"
+import * as path from 'path';
+import * as fs from 'fs';
+import { v4 as uuidv4 } from 'uuid';
+import { UploadsService } from 'src/uploads/uploads.service';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +25,8 @@ export class AuthService {
      constructor(
           private readonly configService: ConfigService,
           private readonly jwtService: JwtService,
-          private readonly prismaService: PrismaService
+          private readonly prismaService: PrismaService,
+          private readonly uploadsService: UploadsService,
      ) {
           this.JWT_ACCESS_TOKEN_TTL = configService.getOrThrow("JWT_ACCESS_TOKEN_TTL")
           this.JWT_REFRESH_TOKEN_TTL = configService.getOrThrow("JWT_REFRESH_TOKEN_TTL")
@@ -48,12 +54,14 @@ export class AuthService {
           if (!roles || !roles.length) throw new NotFoundException('Роли не найдены')
 
           const hashPassword = await argon2.hash(password)
+          const { avatarUrl } = this.generateAvatar(name)
 
           const user = await this.prismaService.user.create({
                data: {
                     email,
                     password: hashPassword,
                     name,
+                    avatarUrl,
                     roles: {
                          connect: roles.map((role) => ({
                               id: role.id
@@ -69,6 +77,12 @@ export class AuthService {
 
           const userRoleNames = user.roles.map(r => r.name)
           return this.auth(res, user.id, userRoleNames)
+     }
+
+     private generateAvatar(name: string) {
+          const fileBuffer = jdenticon.toPng(name, 200);
+          const avatarUrl = this.uploadsService.saveBufferAsFile(fileBuffer);
+          return { avatarUrl };
      }
 
      async login(res: Response, dto: LoginDto) {

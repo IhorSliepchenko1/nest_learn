@@ -1,25 +1,36 @@
-import { Body, Controller, Patch, Req } from '@nestjs/common';
+import { Body, Controller, Patch, Req, UploadedFile, UseFilters, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/decorators/auth.decorator';
 import { Roles } from 'src/auth/decorators/roles.decorator';
-import { ChangeUserPasswordByAdminDto } from './dto/change-user-password-by-admin.dto';
 import { ChangeOwnPasswordDto } from './dto/change-own-password.dto';
 import { Request } from 'express';
+import { changePasswordAsAdminDto } from './dto/change-password-as-admin.dto';
+import { UploadFileInterceptor } from 'src/uploads/interceptors/upload-file.interceptor';
+import { createMulterFilter } from 'src/uploads/filters/multer-exception.filter';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
-  
+  constructor(private readonly userService: UserService,) { }
+
   @JwtAuthGuard()
   @Roles('ADMIN')
   @Patch('change-admin-password')
-  async adminChangeUserPassword(@Body() dto: ChangeUserPasswordByAdminDto) {
-    return await this.userService.adminChangeUserPassword(dto)
+  async adminChangeUserPassword(@Body() dto: changePasswordAsAdminDto) {
+    return await this.userService.changePasswordAsAdmin(dto)
   }
 
   @JwtAuthGuard()
   @Patch('change-own-password')
   async changeOwnPassword(@Req() req: Request, @Body() dto: ChangeOwnPasswordDto) {
     return await this.userService.changeOwnPassword(req, dto)
+  }
+
+  @JwtAuthGuard()
+  @Patch('avatar')
+  @UseInterceptors(UploadFileInterceptor(['image/jpeg', 'image/png'], 2, 'avatar'))
+  @UseFilters(createMulterFilter('2MB'))
+
+  async changeAvatar(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
+    return await this.userService.changeAvatar(req, file)
   }
 }

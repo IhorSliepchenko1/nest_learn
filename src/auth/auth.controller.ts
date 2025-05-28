@@ -18,7 +18,6 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(@Res({ passthrough: true }) res: Response, @Body() dto: RegisterDto) {
-    console.log(dto);
     return await this.authService.register(res, dto)
   }
 

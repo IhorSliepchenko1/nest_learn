@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, IsUUID, MaxLength, MinLength } from "class-validator"
 
-export class ChangeUserPasswordByAdminDto {
+export class changePasswordAsAdminDto {
      @IsNotEmpty({ message: "userId обязательно к заполнению" })
      @IsUUID('4')
      userId: string

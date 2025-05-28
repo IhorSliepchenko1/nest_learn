@@ -5,14 +5,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { getJwtConfig } from 'src/config/jwt.config';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { UploadsModule } from 'src/uploads/uploads.module';
 
 @Module({
   imports: [
+    UploadsModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: getJwtConfig,
       inject: [ConfigService]
-    })
+    }),
   ],
 
   controllers: [AuthController],

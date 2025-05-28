@@ -5,6 +5,7 @@ import {
   CallHandler,
   mixin,
   Type,
+  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -36,7 +37,7 @@ export function UploadFileInterceptor(allowedTypes: string[], MB: number, fieldN
             cb(null, true);
           }
           else {
-            cb(new Error('Данный тип файла не поддерживается'), false);
+            cb(new BadRequestException('Данный тип файла не поддерживается'), false);
           }
         },
         limits: { fileSize: MB * 1024 * 1024 },
