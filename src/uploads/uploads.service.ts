@@ -3,8 +3,8 @@ import * as path from 'path';
 
 @Injectable()
 export class UploadsService {
-     saveFileInfo(file: Express.Multer.File): string {
+     saveFileInfo(file: Express.Multer.File) {
           const filePath = path.join(__dirname, '../../uploads', file.filename);
-          return `Файл збережено за адресою: ${filePath}`;
+          return filePath
      }
 }
