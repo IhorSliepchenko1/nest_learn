@@ -3,6 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import { AppModule } from 'src/app.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { RoleModule } from 'src/role/role.module';
+import { UserModule } from 'src/user/user.module';
 
 export function setupSwagger(app: INestApplication): void {
      const config = new DocumentBuilder()
@@ -18,12 +19,12 @@ export function setupSwagger(app: INestApplication): void {
                     name: 'Authorization',
                     in: 'header',
                },
-               'jwt-token', 
+               'jwt-token',
           )
           .build()
 
      const document = SwaggerModule.createDocument(app, config, {
-          include: [AppModule, AuthModule, RoleModule],
+          include: [AppModule, AuthModule, RoleModule, UserModule],
      });
 
      SwaggerModule.setup('swagger', app, document);

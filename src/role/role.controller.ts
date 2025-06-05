@@ -12,7 +12,6 @@ import { RoleListResponse } from './dto/role-list.dto';
 export class RoleController {
   constructor(private readonly roleService: RoleService) { }
 
-
   @ApiOperation({
     summary: "Создание роли пользователя",
     description: "Создание новой роли для доступы к роутам"
@@ -20,7 +19,6 @@ export class RoleController {
   @ApiOkResponse({
     type: RoleCreateResponse
   })
-
   @ApiConflictResponse({
     description: "Данная роль уже существует"
   })
