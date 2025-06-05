@@ -149,7 +149,7 @@ export class AuthService {
                }
 
                const roles = user.roles.map(r => r.name)
-               if (!roles || !roles.length) throw new NotFoundException('Роли не найдены')
+               if (!roles || !roles.length) throw new ConflictException('Роли не найдены')
 
                return this.auth(res, user.id, roles)
           }

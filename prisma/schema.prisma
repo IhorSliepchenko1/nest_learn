@@ -22,7 +22,7 @@ model User {
 
 model Role {
   id           String   @id @default(uuid())
-  name         String
+  name         String   @unique
   descriptions String?
   users        User[]   @relation("users_roles")
   createdAt    DateTime @default(now()) @map("created_at")

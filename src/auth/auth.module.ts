@@ -10,11 +10,13 @@ import { UploadsModule } from 'src/uploads/uploads.module';
 @Module({
   imports: [
     UploadsModule,
+
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: getJwtConfig,
       inject: [ConfigService]
     }),
+
   ],
 
   controllers: [AuthController],
